@@ -1,0 +1,175 @@
+DatePurchasedFull[\[CapitalOmega]0_, \[Delta]0_, c0_, 
+   n0_, \[Mu]\[Beta]0_, \[Sigma]\[Beta]0_, \[Mu]\[Gamma]0_, \[Sigma]\
+\[Gamma]0_] := 
+  Module[{\[CapitalOmega] = \[CapitalOmega]0, \[Delta] = \[Delta]0, 
+    c = c0, n = 
+     n0, \[Mu]\[Beta] = \[Mu]\[Beta]0, \[Sigma]\[Beta] = \[Sigma]\
+\[Beta]0, \[Mu]\[Gamma] = \[Mu]\[Gamma]0, \[Sigma]\[Gamma] = \[Sigma]\
+\[Gamma]0},
+   data = 
+    TrueUtility[\[CapitalOmega], \[Delta], c, 
+     n, \[Mu]\[Beta], \[Sigma]\[Beta], \[Mu]\[Gamma], \
+\[Sigma]\[Gamma]];
+   PB = data[[1]];
+   EDU = data[[2]];
+   TruePB = data[[3]];
+   TrueEDU = data[[4]];
+   gamma = data[[5]];
+   beta = data[[6]];
+   PmatPB = ConstantArray[0, {24, n}];
+   PmatEDU = ConstantArray[0, {24, n}];
+   CountListPB = ConstantArray[0, n];
+   CountListEDU = ConstantArray[0, n];
+   UtilityListPB = ConstantArray[0, n];
+   UtilityListEDU = ConstantArray[0, n];
+   PercievedUtilityListPB = ConstantArray[0, n];
+   PercievedUtilityListEDU = ConstantArray[0, n];
+   For[t = 1, t <= 24, t++,
+    For[i = 1, i <= n, i++,
+      If[Total[PmatPB][[i]] == 0, 
+        If[PB[[t]][[1, i]] == 
+          TakeSmallest[Transpose[PB[[t]]][[i]], 1][[1]], 
+         PmatPB[[t, i]] = 1, PmatPB[[t, i]] = 0], 0];
+      ];
+    ];
+   For[t = 1, t <= 24, t++,
+    For[i = 1, i <= n, i++,
+      If[Total[PmatEDU][[i]] == 0, 
+        If[EDU[[t]][[1, i]] == 
+          TakeSmallest[Transpose[EDU[[t]]][[i]], 1][[1]], 
+         PmatEDU[[t, i]] = 1, PmatEDU[[t, i]] = 0], 0];
+      ];
+    ];
+   For[j = 1, j <= n, j++,
+    For[i = 1, i <= 24, i++, 
+     If[PmatPB[[i, j]] == 1, CountListPB[[j]] = i; Break[] ]]];
+   For[j = 1, j <= n, j++,
+    For[i = 1, i <= 24, i++, 
+     If[PmatEDU[[i, j]] == 1, CountListEDU[[j]] = i; Break[] ]]];
+   For[i = 1, i <= n, i++,
+    UtilityListPB[[i]] = TruePB[[CountListPB[[i]], i]] + \!\(
+\*UnderoverscriptBox[\(\[Sum]\), \(t = 
+         1\), \(CountListPB[\([\)\(i\)\(]\)] - 1\)]
+\*FractionBox[\(gamma[\([\)\(i\)\(]\)]\), \(25 - t\)]\);
+    UtilityListEDU[[i]] = TrueEDU[[CountListEDU[[i]], i]] + \!\(
+\*UnderoverscriptBox[\(\[Sum]\), \(t = 
+         1\), \(CountListEDU[\([\)\(i\)\(]\)] - 1\)]
+\*FractionBox[\(gamma[\([\)\(i\)\(]\)]\), \(25 - t\)]\);
+    PercievedUtilityListPB[[i]] = c + \!\(
+\*UnderoverscriptBox[\(\[Sum]\), \(t = 
+         1\), \(CountListPB[\([\)\(i\)\(]\)]\)]
+\*FractionBox[\(gamma[\([\)\(i\)\(]\)]\), \(25 - t\)]\);
+    ];
+   AgentTable = ConstantArray[0, {(n + 1), 12}];
+   AgentTable[[1, 1]] = " \!\(\*
+StyleBox[\"Agent\",\nFontWeight->\"Bold\"]\)\!\(\*
+StyleBox[\" \",\nFontWeight->\"Bold\"]\)\!\(\*
+StyleBox[\"Name\",\nFontWeight->\"Bold\"]\)\!\(\*
+StyleBox[\" \",\nFontWeight->\"Bold\"]\)";
+   AgentTable[[1, 2]] = " \!\(\*
+StyleBox[\"Beta\",\nFontWeight->\"Bold\"]\)\!\(\*
+StyleBox[\" \",\nFontWeight->\"Bold\"]\)";
+   AgentTable[[1, 3]] = " \!\(\*
+StyleBox[\"Gamma\",\nFontWeight->\"Bold\"]\)\!\(\*
+StyleBox[\" \",\nFontWeight->\"Bold\"]\)";
+   AgentTable[[1, 4]] = " \!\(\*
+StyleBox[\"Q\",\nFontWeight->\"Bold\"]\)\!\(\*
+StyleBox[\"-\",\nFontWeight->\"Bold\"]\)\!\(\*
+StyleBox[\"HDU\",\nFontWeight->\"Bold\"]\)\!\(\*
+StyleBox[\" \",\nFontWeight->\"Bold\"]\)\!\(\*
+StyleBox[\"Date\",\nFontWeight->\"Bold\"]\)\!\(\*
+StyleBox[\" \",\nFontWeight->\"Bold\"]\)";
+   AgentTable[[1, 5]] = " \!\(\*
+StyleBox[\"EDU\",\nFontWeight->\"Bold\"]\)\!\(\*
+StyleBox[\" \",\nFontWeight->\"Bold\"]\)\!\(\*
+StyleBox[\"Date\",\nFontWeight->\"Bold\"]\)\!\(\*
+StyleBox[\" \",\nFontWeight->\"Bold\"]\)";
+   AgentTable[[1, 6]] = " \!\(\*
+StyleBox[\"Rational\",\nFontWeight->\"Bold\"]\)\!\(\*
+StyleBox[\" \",\nFontWeight->\"Bold\"]\)\!\(\*
+StyleBox[\"Date\",\nFontWeight->\"Bold\"]\)\!\(\*
+StyleBox[\" \",\nFontWeight->\"Bold\"]\)";
+   AgentTable[[1, 7]] = " \!\(\*
+StyleBox[\"Q\",\nFontWeight->\"Bold\"]\)\!\(\*
+StyleBox[\"-\",\nFontWeight->\"Bold\"]\)\!\(\*
+StyleBox[\"HDU\",\nFontWeight->\"Bold\"]\)\!\(\*
+StyleBox[\" \",\nFontWeight->\"Bold\"]\)\!\(\*
+StyleBox[\"Total\",\nFontWeight->\"Bold\"]\)\!\(\*
+StyleBox[\" \",\nFontWeight->\"Bold\"]\)\!\(\*
+StyleBox[\"Cost\",\nFontWeight->\"Bold\"]\)\!\(\*
+StyleBox[\" \",\nFontWeight->\"Bold\"]\)";
+   AgentTable[[1, 8]] = " \!\(\*
+StyleBox[\"EDU\",\nFontWeight->\"Bold\"]\)\!\(\*
+StyleBox[\" \",\nFontWeight->\"Bold\"]\)\!\(\*
+StyleBox[\"Total\",\nFontWeight->\"Bold\"]\)\!\(\*
+StyleBox[\" \",\nFontWeight->\"Bold\"]\)\!\(\*
+StyleBox[\"Cost\",\nFontWeight->\"Bold\"]\)\!\(\*
+StyleBox[\" \",\nFontWeight->\"Bold\"]\)";
+   AgentTable[[1, 9]] = " \!\(\*
+StyleBox[\"Rational\",\nFontWeight->\"Bold\"]\)\!\(\*
+StyleBox[\" \",\nFontWeight->\"Bold\"]\)\!\(\*
+StyleBox[\"Total\",\nFontWeight->\"Bold\"]\)\!\(\*
+StyleBox[\" \",\nFontWeight->\"Bold\"]\)\!\(\*
+StyleBox[\"Cost\",\nFontWeight->\"Bold\"]\)\!\(\*
+StyleBox[\" \",\nFontWeight->\"Bold\"]\)";
+   AgentTable[[1, 10]] = " \!\(\*
+StyleBox[FractionBox[
+RowBox[{\" \", 
+RowBox[{
+StyleBox[\"Q\",\nFontWeight->\"Bold\"], 
+StyleBox[\"-\",\nFontWeight->\"Bold\"], 
+RowBox[{
+StyleBox[\"HDU\",\nFontWeight->\"Bold\"], \" \", \"Cost\", 
+StyleBox[\" \",\nFontWeight->\"Bold\"]}]}]}], 
+RowBox[{\"EDU\", \" \", \"Cost\"}]],\nFontWeight->\"Bold\"]\)\!\(\*
+StyleBox[\" \",\nFontWeight->\"Bold\"]\)";
+   AgentTable[[1, 11]] = " \!\(\*
+StyleBox[FractionBox[
+RowBox[{\" \", 
+RowBox[{
+StyleBox[\"Q\",\nFontWeight->\"Bold\"], 
+StyleBox[\"-\",\nFontWeight->\"Bold\"], 
+RowBox[{
+StyleBox[\"HDU\",\nFontWeight->\"Bold\"], \" \", \"Cost\", 
+StyleBox[\" \",\nFontWeight->\"Bold\"]}]}]}], 
+RowBox[{\"Rational\", \" \", \"Cost\"}]],\n\
+FontWeight->\"Bold\"]\)\!\(\*
+StyleBox[\" \",\nFontWeight->\"Bold\"]\)";
+   AgentTable[[1, 12]] = " \!\(\*
+StyleBox[FractionBox[
+RowBox[{\" \", 
+RowBox[{\"Actual\", \" \", \"Cost\", 
+StyleBox[\" \",\nFontWeight->\"Bold\"]}]}], 
+RowBox[{\"Expected\", \" \", \"Cost\"}]],\n\
+FontWeight->\"Bold\"]\)\!\(\*
+StyleBox[\" \",\nFontWeight->\"Bold\"]\)";
+   For[i = 1, i <= n, i++,
+    AgentTable[[i + 1, 1]] = i;
+    AgentTable[[i + 1, 2]] = beta[[i]];
+    AgentTable[[i + 1, 3]] = gamma[[i]];
+    AgentTable[[i + 1, 4]] = CountListPB[[i]];
+    AgentTable[[i + 1, 5]] = CountListEDU[[i]];
+    AgentTable[[i + 1, 6]] = 1;
+    AgentTable[[i + 1, 7]] = UtilityListPB[[i]];
+    AgentTable[[i + 1, 8]] = UtilityListEDU[[i]];
+    AgentTable[[i + 1, 9]] = TruePB[[1, i]];
+    AgentTable[[i + 1, 10]] = (AgentTable[[i + 1, 7]]/
+      AgentTable[[i + 1, 8]])  ;
+    AgentTable[[i + 1, 11]] = (AgentTable[[i + 1, 7]]/
+      AgentTable[[i + 1, 9]])  ;
+    AgentTable[[i + 1, 12]] = (AgentTable[[i + 1, 7]]/
+      PercievedUtilityListPB[[i]])  ;
+    ];
+   BetaExpectedCostRatioRegressionData = 
+    Table[{AgentTable[[i + 1, 2]], AgentTable[[i + 1, 12]]}, {i, 1, 
+      n}];
+   BetaActualCostRatioRegressionData = 
+    Table[{AgentTable[[i + 1, 2]], AgentTable[[i + 1, 10]]}, {i, 1, 
+      n}];
+   DateRegressionData = 
+    Table[{AgentTable[[i + 1, 4]], AgentTable[[i + 1, 10]]}, {i, 1, 
+      n}];
+   {AgentTable, BetaActualCostRatioRegressionData, DateRegressionData,
+     BetaExpectedCostRatioRegressionData, Total[Transpose[PmatPB]], 
+    Total[Transpose[PmatEDU]]}
+   ];
