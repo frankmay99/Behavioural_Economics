@@ -1,0 +1,78 @@
+TrueUtility[\[CapitalOmega]0_, \[Delta]0_, c0_, 
+  n0_, \[Mu]\[Beta]0_, \[Sigma]\[Beta]0_, \[Mu]\[Gamma]0_, \[Sigma]\
+\[Gamma]0_] := 
+ Module[{  \[CapitalOmega] = \[CapitalOmega]0, \[Delta] = \[Delta]0, 
+   c = c0, n = 
+    n0, \[Mu]\[Beta] = \[Mu]\[Beta]0, \[Sigma]\[Beta] = \[Sigma]\
+\[Beta]0, \[Mu]\[Gamma] = \[Mu]\[Gamma]0, \[Sigma]\[Gamma] = \[Sigma]\
+\[Gamma]0},
+  BetaList = 
+   Table[RandomVariate[
+     TruncatedDistribution[{0, 1}, 
+      NormalDistribution[\[Mu]\[Beta], \[Sigma]\[Beta]]]], {i, 1, 
+     n}];
+  GammaList = 
+   Table[RandomVariate[
+     TruncatedDistribution[{0, \[Infinity]}, 
+      NormalDistribution[\[Mu]\[Gamma], \[Sigma]\[Gamma]]]], {i, 1, 
+     n}];
+  PurchaseList1 = ConstantArray[0, {24, n}];
+  PurchaseListEDU = ConstantArray[0, {24, n}];
+  TrueUtilityMat = ConstantArray[0, {24, n}];
+  TrueUtilityMatEDU = ConstantArray[0, {24, n}];
+  TotalPurchases1 = 0;
+  TotalPurchasesEDU = 0;
+  PBUtilityEvolution = 
+   Table[utilitylist = ConstantArray[0, {(25 - (t - 1)), n}];
+    For[j = 1, j <= n, j++,
+     utilitylist[[1, j]] = GammaList[[j]]/(25 - t) + c;
+     utilitylist[[25 - (t - 1), j]] = \[Infinity];
+     TrueUtilityMat[[t, j]] = 
+      GammaList[[j]]/(25 - t) + 
+       c + (TotalPurchases1/n) \[CapitalOmega];
+     ];
+    For[i = 2, i <= 25 - t, i++,
+     For[j = 1, j <= n, j++,
+       utilitylist[[i, j]] = 
+         BetaList[[j]] \[Delta]^
+          i (GammaList[[j]]/(25 - (t + (i - 1))) + c);
+       ];
+     ];
+    
+    For[i = 1, i <= n, i++,
+     If[Total[PurchaseList1][[i]] == 0, 
+       If[utilitylist[[1, i]] == 
+         TakeSmallest[Transpose[utilitylist][[i]], 1][[1]], 
+        PurchaseList1[[t, i]] = 1, PurchaseList1[[t, i]] = 0], 
+       PurchaseList1[[t, i]] = 0];
+     ];
+    TotalPurchases1 = Total[Flatten[PurchaseList1]];
+    N[utilitylist]
+    , {t, 1, 24}];
+  EDUUtilityEvolution = 
+   Table[EDU = ConstantArray[0, {(25 - (t - 1)), n}];
+    For[j = 1, j <= n, j++,
+     EDU[[1, j]] = GammaList[[j]]/(25 - t) + c;
+     EDU[[25 - (t - 1), j]] = \[Infinity];
+     TrueUtilityMatEDU[[t, j]] = 
+      GammaList[[j]]/(25 - t) + 
+       c + (TotalPurchasesEDU/n) \[CapitalOmega];
+     ];
+    For[i = 2, i <= 25 - t, i++,
+     For[j = 1, j <= n, j++,
+       EDU[[i, j]] = \[Delta]^
+          i (GammaList[[j]]/(25 - (t + (i - 1))) + c);
+       ];
+     ];
+    For[i = 1, i <= n, i++,
+     If[Total[PurchaseListEDU][[i]] == 0, 
+       If[EDU[[1, i]] == TakeSmallest[Transpose[EDU][[i]], 1][[1]], 
+        PurchaseListEDU[[t, i]] = 1, PurchaseListEDU[[t, i]] = 0], 
+       PurchaseListEDU[[t, i]] = 0];
+     ];
+    TotalPurchasesEDU = Total[Flatten[PurchaseListEDU]];
+    N[EDU]
+    , {t, 1, 24}];
+  {PBUtilityEvolution, EDUUtilityEvolution, TrueUtilityMat, 
+   TrueUtilityMatEDU, GammaList , BetaList}
+  ]
